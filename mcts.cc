@@ -72,7 +72,7 @@ public:
         mcts_node* best_node = nullptr;
         double max_score = - 9999.0;
         double c = 0.0;
-        if (is_exploration) {
+        if (is_exploration == 1) {
             c = 1.0 / sqrt(2);
         }
         
@@ -117,7 +117,7 @@ public:
         while (node->game_state.is_terminal() == false) {
 
             if (node->is_all_expand()) {
-                node = node->get_best_child(0);
+                node = node->get_best_child(1);
             } else {
                 // expand a new node
                 auto new_node = node->expand_node();
@@ -127,17 +127,52 @@ public:
         return node;
     }
 
-    mcts_node* main_search() {
+    
 
-        return nullptr;
+    void backprop(double reward) {
+
+        this->q_value = this->q_value + reward;
+
+        if (this->parent != nullptr) {
+            auto node = this->parent;
+            node->backprop(reward);
+        }
+    }
+
+    mcts_node* main_search(int computation_budge) {
+
+        for (int d = 0; d < computation_budge; d++) {
+            
+            mcts_node* leaf_node = tree_policy(this);
+            double reward = leaf_node->default_policy();
+            leaf_node->backprop(reward);
+        }
+
+        // get the best child of root
+        mcts_node* best_child = this->get_best_child(0);
+
+        
+
+        return best_child;
     }
 
 };
-
+/*
 int main() {
 
-
+    state root_state;
+    mcts_node* root = new mcts_node();
+    root->q_value = 0.0;
+    root->visit_times = 0;
+    root->game_state = root_state;
+    root->children = {};
+    int epoches = 100;
+    int computation_budge = 10;
+    for (auto epoch=0; epoch < epoches; epoch++) {
+        root = root->main_search(computation_budge);
+    }
 
     return 1;
 
 }
+*/

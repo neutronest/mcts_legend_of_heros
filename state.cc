@@ -11,6 +11,8 @@ class state {
 
 public:
 
+    virtual ~state();
+
     virtual state gen_next_state();
 
     virtual int get_state_limit();
