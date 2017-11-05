@@ -187,8 +187,8 @@ int main() {
     root->visit_times = 0;
     root->game_state = root_state;
     root->children = {};
-    int epoches = 10;
-    int computation_budge = 100;
+    int epoches = 1000;
+    int computation_budge = 10;
 
     auto best_node = root;
     for (auto epoch=0; epoch < epoches; epoch++) {

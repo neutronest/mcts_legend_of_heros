@@ -10,7 +10,7 @@
 using namespace std;
 
 const vector<int> all_states = {1, -1, 2, -2};
-const int MAX_ROUND_NUM = 10;
+const int MAX_ROUND_NUM = 100;
 
 class nim_state :  public state {
 
