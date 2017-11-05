@@ -20,7 +20,7 @@ public:
 class estelle_atk: public skill {
 public:
 
-    estelle_atk_skill() {
+    estelle_atk() {
         this->name = "estelle's normal attack."; 
     }
 
@@ -34,7 +34,7 @@ public:
     }
 };
 
-class estelle_encourage() : public skill {
+class estelle_encourage: public skill {
 public:
     estelle_encourage() {
         this->name = "estelle's encourage: mina, ga-ba-de-gu-da-sai-i-ne!!";
@@ -42,7 +42,7 @@ public:
 
     void apply(player* caster, vector<player*> players) {
 
-        if (castter->cur_ep < 60) {
+        if (caster->cur_ep < 60) {
             cout<<"[WARNING... estelle_encouage has not enough ep]"<<endl;
             return;
         }
@@ -57,7 +57,7 @@ public:
     }
 };
 
-class estelle_heal_small() : public skill {
+class estelle_heal_small: public skill {
 public:
     estelle_heal_small() {
         this->name = "estelle is using small healing!";
@@ -72,17 +72,17 @@ public:
             cout<<"[WARNING..estelle_heal_small but ep < 30]"<<endl;
             return;
         }
-        auto player = players[0];
-        player->cur_hp = max(player->base_hp, player->cur_hp + 800);
-        caster->ep -= 30;
+        player* p = players[0];
+        p->cur_hp = max(p->get_base_hp(), p->cur_hp + 800);
+        caster->cur_ep -= 30;
     }
 };
 
-class estelle_heal_all() : public skill {
+class estelle_heal_all: public skill {
 
 public:
     estelle_heal_all() {
-        this->name = "estelle is using "
+        this->name = "estelle is using ";
 
     }
-}
+};

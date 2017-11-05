@@ -6,8 +6,6 @@
 #include <map>
 #include <cmath>
 
-#include "skill.cc"
-
 using namespace std;
 
 class player {
@@ -16,7 +14,7 @@ private:
     int base_ep; // or sp
     int base_sp;
 
-    vector<skill*> skills = {};
+
     
 public:
     int cur_hp;
@@ -47,15 +45,6 @@ public:
     void set_base_sp(int sp) {
         this->base_sp = sp;
     }
-
-    vector<skill*> get_skills() {
-        return this->skills;
-    }
-    
-    void set_skills(vector<skill*> skills) {
-        this->skills = skills;
-    }
-
     
 };
     
