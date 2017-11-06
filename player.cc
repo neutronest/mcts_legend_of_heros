@@ -22,6 +22,7 @@ public:
     int cur_sp;
     int cur_atk;
     int encouraged;
+    int shell;
 
     int get_base_hp() {
         return this->base_hp;
