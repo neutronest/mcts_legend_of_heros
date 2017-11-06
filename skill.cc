@@ -124,7 +124,9 @@ public:
     }
 };
 
+///////////////////
 // Joshua
+//////////////////
 
 class joshua_atk : public skill {
 public:
@@ -160,8 +162,12 @@ public:
             return;
         }
         auto p = players[0];
-        
-
+        p->cur_hp = min(0, p->cur_hp - 2 * caster->cur_atk);
+        // caster add sp back
+        caster->cur_sp  = max(200, caster->cur_sp + 20);
+        return;
     }
+};
 
-}
+
+

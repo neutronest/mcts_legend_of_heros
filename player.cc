@@ -13,6 +13,7 @@ private:
     int base_hp;
     int base_ep; // or sp
     int base_sp;
+    int base_atk;
 
 
     
@@ -45,6 +46,16 @@ public:
     }
     void set_base_sp(int sp) {
         this->base_sp = sp;
+        return;
+    }
+
+    int get_base_atk() {
+        return this->base_atk;
+    }
+
+    void set_base_atk(int atk) {
+        this->base_atk = atk;
+        return;
     }
     
 };
