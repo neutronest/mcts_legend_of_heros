@@ -6,6 +6,7 @@
 #include <map>
 #include <cmath>
 
+#pragma once
 #include "player.cc"
 
 using namespace std;
@@ -19,7 +20,7 @@ public:
 
 
 class normal_atk : public skill {
-
+public:
     normal_atk() {
         this->name = "normal atk.";
     }

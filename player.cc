@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <map>
 #include <cmath>
+#pragma once
 
 using namespace std;
 
@@ -24,7 +25,6 @@ public:
     double cur_atk;
     int encouraged;
     int shell;
-
     double get_base_hp() {
         return this->base_hp;
     }
@@ -58,5 +58,18 @@ public:
         return;
     }
     
+    player(int hp, int ep, int sp, int atk) {
+        this->set_base_hp(hp);
+        this->set_base_ep(ep);
+        this->set_base_sp(sp);
+        this->set_base_atk(atk);
+        this->cur_hp =  this->get_base_hp();
+        this->cur_ep =  this->get_base_ep();
+        this->cur_sp =  this->get_base_sp();
+        this->cur_atk = this->get_base_atk();
+        this->encouraged = 0;
+        this->shell = 0;
+        
+    }
 };
     
