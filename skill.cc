@@ -16,6 +16,8 @@ class skill {
 public:
     string name;
     virtual void apply(player* caster, vector<player*> players) = 0;
+
+    virtual bool is_avaible(player* caster) = 0;
 };
 
 
@@ -38,6 +40,10 @@ public:
             return;
         }
         p->cur_hp = fmax(0, p->cur_hp - caster->cur_atk);
+    }
+
+    bool is_avaible(player* caster) {
+        return true;
     }
 };
 
@@ -62,6 +68,14 @@ public:
         }
         caster->cur_ep = fmax(0, caster->cur_ep - 60);
     }
+
+
+    bool is_avaible(player* caster) {
+        if (caster->cur_ep < 60) {
+            return false;
+        }
+        return true;
+    }
 };
 
 class estelle_heal_small: public skill {
@@ -82,6 +96,14 @@ public:
         player* p = players[0];
         p->cur_hp = fmin(p->get_base_hp(), p->cur_hp + 1200);
         caster->cur_ep -= 30;
+    }
+
+    
+    bool is_avaible(player* caster) {
+        if (caster->cur_ep < 30) {
+            return false;
+        }
+        return true;
     }
 };
 
@@ -107,6 +129,14 @@ public:
         }
         caster->cur_ep -= 60;
     }
+
+
+    bool is_avaible(player* caster) {
+        if (caster->cur_ep < 60) {
+            return false;
+        }
+        return true;
+    }
 };
 
 class estelle_shell_all : public skill {
@@ -128,6 +158,14 @@ public:
             p->shell = 1;
         }
         caster->cur_ep = fmax(0, caster->cur_ep - 80);
+    }
+
+
+    bool is_avaible(player* caster) {
+        if (caster->cur_ep < 80) {
+            return false;
+        }
+        return true;
     }
 };
 
@@ -163,6 +201,15 @@ public:
         caster->cur_sp  = fmax(200, caster->cur_sp + 20);
         return;
     }
+
+
+    bool is_avaible(player* caster) {
+
+        if (caster->cur_sp < 30) {
+            return false;
+        }
+        return true;
+    }
 };
 
 class joshua_smove : public skill {
@@ -192,6 +239,14 @@ public:
         return;
     }
 
+
+    bool is_avaible(player* caster) {
+        
+        if (caster->cur_sp < 100) {
+            return false;
+        }
+        return true;
+    }
 };
 
 
@@ -214,6 +269,11 @@ public:
         auto p = players[0];
         p->cur_hp = fmax(0, p->cur_hp - 1.6 * caster->cur_atk);
     }
+
+
+    bool is_avaible(player* caster) {
+        return true;
+    }
 };
 
 class leon_ghostfire_atk : public skill {
@@ -232,6 +292,11 @@ public:
             p->cur_hp = fmax(0, p->cur_hp - 0.8 * caster->cur_atk);
         }
     }
+
+
+    bool is_avaible(player* caster) {
+        return true;
+    }
 };
 
 
@@ -245,6 +310,11 @@ public:
     void apply(player* caster, vector<player*> players) {
         caster->encouraged = 3;
     }
+
+
+    bool is_avaible(player* caster) {
+        return true;
+    }
 };
 
 class leon_deep_shell : public skill {
@@ -256,6 +326,11 @@ public:
 
     void apply(player* caster, vector<player*> players){
         caster->shell = 2;
+    }
+
+
+    bool is_avaible(player* caster) {
+        return true;
     }
 };
 
@@ -279,5 +354,10 @@ public:
             }
         }
         return;
+    }
+
+
+    bool is_avaible(player* caster) {
+        return true;
     }
 };
