@@ -130,7 +130,7 @@ public:
             iter != players.end();
             iter++) {
             auto p = *iter;
-            p->cur_hp = fmax(p->get_base_hp(), p->cur_hp + 1500);
+            p->cur_hp = fmin(p->get_base_hp(), p->cur_hp + 1500);
         }
         caster->cur_ep -= 60;
     }
@@ -203,6 +203,7 @@ public:
             
         }
         // caster add sp back
+        caster->cur_sp = fmax(0, caster->cur_sp - 30);
         caster->cur_sp  = fmin(200, caster->cur_sp + 20);
         return;
     }

@@ -250,7 +250,7 @@ int main() {
     while (cur_state->is_over == false) {
         cur_state->pprint_state();
         cur_state = cur_state->gen_next_state();
-        //usleep(3 * 1000);
+        usleep(3 * 1000000);
     }
     cur_state->pprint_state();
     
