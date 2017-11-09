@@ -11,10 +11,14 @@
 
 using namespace std;
 
+
+
+
 class skill {
 
 public:
     string name;
+
     virtual void apply(player* caster, vector<player*> players) = 0;
 
     virtual bool is_avaible(player* caster) = 0;
@@ -24,7 +28,7 @@ public:
 class normal_atk : public skill {
 public:
     normal_atk() {
-        this->name = "normal atk.";
+        this->name = "普通攻击！";
     }
 
     void apply(player* caster, vector<player*> players) {
@@ -40,6 +44,7 @@ public:
             return;
         }
         p->cur_hp = fmax(0, p->cur_hp - caster->cur_atk);
+        caster->cur_sp = fmin(200, caster->cur_sp+10);
     }
 
     bool is_avaible(player* caster) {
@@ -50,7 +55,7 @@ public:
 class estelle_encourage: public skill {
 public:
     estelle_encourage() {
-        this->name = "estelle's encourage: mina, ga-ba-de-gu-da-sai-i-ne!!";
+        this->name = "大家加油啊！";
     }
 
     void apply(player* caster, vector<player*> players) {
@@ -81,7 +86,7 @@ public:
 class estelle_heal_small: public skill {
 public:
     estelle_heal_small() {
-        this->name = "estelle is using small healing!";
+        this->name = "小回复！";
     }
 
     void apply(player* caster, vector<player*> players) {
@@ -111,7 +116,7 @@ class estelle_heal_all: public skill {
 
 public:
     estelle_heal_all() {
-        this->name = "estelle is using all healing!";
+        this->name = "风之愈！";
     }
 
     void apply(player* caster, vector<player*> players)  {
@@ -142,7 +147,7 @@ public:
 class estelle_shell_all : public skill {
 public:
     estelle_shell_all() {
-        this->name = "estelle is using shell all!";
+        this->name = "大地之墙！";
     }
 
     void apply(player* caster, vector<player*> players) {
@@ -176,7 +181,7 @@ public:
 class joshua_double_atk : public skill {
 public:
     joshua_double_atk() {
-        this->name = "joshua is using double atk!";
+        this->name = "双连击！";
     }
 
     void apply(player* caster, vector<player*> players) {
@@ -194,11 +199,11 @@ public:
         if (p->shell > 0) {
             p->shell -= 1;
         } else {
-            p->cur_hp = fmin(0, p->cur_hp - 2 * caster->cur_atk);
+            p->cur_hp = fmax(0, p->cur_hp - 2 * caster->cur_atk);
             
         }
         // caster add sp back
-        caster->cur_sp  = fmax(200, caster->cur_sp + 20);
+        caster->cur_sp  = fmin(200, caster->cur_sp + 20);
         return;
     }
 
@@ -215,7 +220,7 @@ public:
 class joshua_smove : public skill {
 public:
     joshua_smove() {
-        this->name = "joshua is using S-move!";
+        this->name = "秘技-幻影奇袭！";
     }
 
     void apply(player* caster, vector<player*> players) {
@@ -255,7 +260,7 @@ class leon_shadow_atk : public skill {
 
 public:
     leon_shadow_atk() {
-        this->name = "leon is using shaodow atk";
+        this->name = "暗影剑！";
     }
 
     void apply(player* caster, vector<player*> players) {
@@ -280,7 +285,7 @@ class leon_ghostfire_atk : public skill {
 
 public:
     leon_ghostfire_atk() {
-        this->name = "leon is using ghostfire atk";
+        this->name = "鬼炎斩！";
     }
 
     void apply(player* caster, vector<player*> players) {
@@ -304,7 +309,7 @@ class leon_buff : public skill {
 
 public:
     leon_buff() {
-        this->name = "leon is using buff";
+        this->name = "修罗之怒！";
     }
 
     void apply(player* caster, vector<player*> players) {
@@ -321,7 +326,7 @@ class leon_deep_shell : public skill {
 
 public:
     leon_deep_shell() {
-        this->name = "leon is using deep shell";
+        this->name = "大地之障·改";
     }
 
     void apply(player* caster, vector<player*> players){
@@ -337,7 +342,7 @@ public:
 class leon_final_move : public skill {
 public:
     leon_final_move() {
-        this->name = "leon is using final move!!";
+        this->name = "S-冥皇击！";
     }
 
     void apply(player* caster, vector<player*> players) {

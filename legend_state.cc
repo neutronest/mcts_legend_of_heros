@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <map>
 #include <cmath>
+#include <ctime>
+#include <unistd.h>
+
 
 #pragma once
 #include "state.cc"
@@ -16,66 +19,89 @@ using namespace std;
 
 enum class legend_turn {E, J, L};
 
+class action {
+public:
+    player* caster;
+    vector<player*> target;
+    skill* motion;
+
+    action(player* caster_, vector<player*> target_, skill* motion_) {
+        this->caster = caster_;
+        this->target = target_;
+        this->motion = motion_;
+    }
+};
+
 class gamer_status {
 
 public:
 
     string name;
     player* gamer;
-    vector<skill*> actions;
-    vector<skill*> avaible_actions;
+    vector<action*> actions;
+    vector<action*> avaible_actions;
 };
 
 class legend_state : public state {
 
 public:
 
-    gamer_status* estelle;
-    gamer_status* joshua;
-    gamer_status* leon;
-    legend_turn cur_turn;
-    bool is_over;
+    gamer_status* estelle = new gamer_status();
+    gamer_status* joshua = new gamer_status();
+    gamer_status* leon = new gamer_status();
+    legend_turn cur_turn = legend_turn::E;
+    bool is_over = false;
 
 
 
     legend_state() {
         
         // init each players
-        // estelle
+        //
+      
         player* estelle_gamer = new player(2000.0, 200.0, 0.0, 200.0);
-        vector<skill*> estelle_skills = {new normal_atk(), 
-                                         new estelle_encourage(), 
-                                         new estelle_heal_small(), 
-                                         new estelle_heal_all(), 
-                                         new estelle_shell_all()};
-        estelle->name = "estelle";
-        estelle->gamer = estelle_gamer;
-        estelle->actions = estelle_skills;
-        estelle->avaible_actions = {};
-        
-        // yoshua
         player* joshua_gamer = new player(1800.0, 0.0, 0.0, 300.0);
-        vector<skill*> joshua_skills = {
-            new normal_atk(),
-            new joshua_double_atk(),
-            new joshua_smove()
+        player* leon_gamer = new player(20000.0, 0.0, 0.0, 500.0);
+
+        vector<action*> estelle_actions = {
+            new action(estelle_gamer, {leon_gamer}, new normal_atk()),
+            new action(estelle_gamer, {estelle_gamer, joshua_gamer}, new estelle_encourage()),
+            new action(estelle_gamer, {estelle_gamer}, new estelle_heal_small()),
+            new action(estelle_gamer, {joshua_gamer}, new estelle_heal_small()),
+            new action(estelle_gamer, {estelle_gamer, joshua_gamer}, new estelle_heal_all()),
+            new action(estelle_gamer, {estelle_gamer, joshua_gamer}, new estelle_shell_all())
         };
-        joshua->name = "joshua";
+        estelle->name = "艾丝蒂尔";
+        estelle->gamer = estelle_gamer;
+        estelle->actions = estelle_actions;
+        estelle->avaible_actions = {};
+        // joshua
+        vector<action*> joshua_actions = {
+            new action(joshua_gamer, {leon_gamer}, new normal_atk()),
+            new action(joshua_gamer, {leon_gamer}, new joshua_double_atk()),
+            new action(joshua_gamer, {leon_gamer}, new joshua_smove())
+
+        };
+        joshua->name = "约修亚";
         joshua->gamer = joshua_gamer;
-        joshua->actions = joshua_skills;
+        joshua->actions = joshua_actions;
         joshua->avaible_actions = {};
 
         // leon
-        player* leon_gamer = new player(20000.0, 0.0, 0.0, 500.0);
-        leon->name = "leon";
-        leon->gamer = leon_gamer;
-        leon->actions = {
-            new leon_shadow_atk(),
-            new leon_ghostfire_atk(),
-            new leon_buff(),
-            new leon_deep_shell(),
-            new leon_final_move()
+        vector<action*> leon_actions = {
+            new action(leon_gamer, {estelle_gamer}, new normal_atk()),
+            new action(leon_gamer, {joshua_gamer}, new normal_atk()),
+            new action(leon_gamer, {estelle_gamer}, new leon_shadow_atk()),
+            new action(leon_gamer, {joshua_gamer}, new leon_shadow_atk()),
+            new action(leon_gamer, {estelle_gamer, joshua_gamer}, new leon_ghostfire_atk()),
+            new action(leon_gamer, {leon_gamer}, new leon_buff()),
+            new action(leon_gamer, {leon_gamer}, new leon_deep_shell()),
+            new action(leon_gamer, {estelle_gamer, joshua_gamer}, new leon_final_move())
+
         };
+        leon->name = "剑帝";
+        leon->gamer = leon_gamer;
+        leon->actions = leon_actions;
         leon->avaible_actions = {};
         cur_turn = legend_turn::E;
         is_over = false;
@@ -83,10 +109,7 @@ public:
 
     bool is_terminal(){
 
-        if (this->estelle->gamer->cur_hp <= 0) {
-            return true;
-        }
-        if (this->joshua->gamer->cur_hp <= 0) {
+        if (this->estelle->gamer->cur_hp <= 0 && this->joshua->gamer->cur_hp <= 0) {
             return true;
         }
         if (this->leon->gamer->cur_hp <= 0) {
@@ -96,13 +119,14 @@ public:
     }
 
     void get_avaible_actions(gamer_status* cur_status) {
+
         cur_status->avaible_actions = {};
         for(auto iter = cur_status->actions.begin();
             iter != cur_status->actions.end();
             iter++) {
-            auto p = *iter;
-            if (p->is_avaible(cur_status->gamer) == true) {
-                cur_status->avaible_actions.push_back(p);
+            auto action_ = *iter;
+            if (action_->motion->is_avaible(cur_status->gamer) == true) {
+                cur_status->avaible_actions.push_back(action_);
             }
         }
         return;
@@ -164,23 +188,71 @@ public:
         cout<<cur_status->name<<"'s turn: "<<endl;
         this->get_avaible_actions(cur_status);
         int len_of_avaible_actions = cur_status->avaible_actions.size();
+        
         int r = rand() % len_of_avaible_actions;
-        cur_status->avaible_actions[r]->apply(cur_status->gamer, {});
+        action* cur_action = cur_status->avaible_actions[r];
+        cur_action->motion->apply(cur_action->caster, cur_action->target);
+        cout<<cur_status->name<<"使用了 "<<cur_action->motion->name<<" ..."<<endl;
 
         if (this->is_terminal()) {
             this->is_over = true;
+            cout<<"游戏结束!!!!"<<endl;
         }
 
         this->get_next_turn();
 
-        return nullptr;
+        cout<<"----------"<<endl;
+        return this;
+    }
+
+    void pprint_state() {
+        // print information of each player
+        // foramt:
+        // estelle- HP-1000 MP-1000 joshua- 
+        int estelle_hp = this->estelle->gamer->cur_hp;
+        int estelle_ep = this->estelle->gamer->cur_ep;
+        int joshua_hp = this->joshua->gamer->cur_hp;
+        int joshua_sp = this->joshua->gamer->cur_sp;
+        int leon_hp = this->leon->gamer->cur_hp;
+        cout<<"艾丝蒂尔- HP:"<<estelle_hp<<" EP: "<<estelle_ep;
+        cout<<"约修亚- HP:"<<joshua_hp<<" SP: "<<joshua_sp;
+        cout<<"剑帝- HP:"<<leon_hp<<endl;
+
     }
 
     bool simulate_default_policy() {
 
+        return false;
     }   
 
+    int get_state_limit() {
+        return -1;
+    }
+    int get_available_state_limit() {
+        return -1;
+    }
+    string get_encoding() {
+        return "";
+    }
+    double get_reward() {
+        return 0.0;
+    }
+    void pprint() {
 
-
+    }
 };
+
+int main() {
+
+    cout<<"start"<<endl;
+    srand((unsigned)time(0)); 
+    legend_state* cur_state = new legend_state();    
+    while (cur_state->is_over == false) {
+        cur_state->pprint_state();
+        cur_state = cur_state->gen_next_state();
+        //usleep(3 * 1000);
+    }
+    cur_state->pprint_state();
+    
+}
 

@@ -30,56 +30,6 @@ public:
     bool is_terminal();
     double get_reward();
     void pprint();
-
-    // methods
-    /*
-    state gen_next_state() const {
-        // random
-        int r = rand() % (this->get_available_state_limit());
-        nim_state new_state(0);
-        new_state.cur_value = this->cur_value + all_states[r];
-        new_state.cur_round_idx = this->cur_round_idx + 1;
-        new_state.state_history = this->state_history; // copy by value
-        new_state.state_history.push_back(to_string(all_states[r]));
-        return new_state;
-    }
-    
-    int get_state_limit() const {
-        return all_states.size();
-    }
-
-    int get_available_state_limit() const {
-        return all_states.size();
-    }
-
-    string get_encoding() const {
-        return to_string(cur_value);
-    }
-
-    bool is_terminal() const {
-        if (this->cur_value == 1) {
-            return true;
-        }
-        return false;
-    }
-
-    double get_reward() const {
-        return - abs(1 - this->cur_value);
-    }
-
-    void pprint() const {
-        cout<<"value: "<<this->cur_value<<" round: "<<this->cur_round_idx<<" history: ";
-        cout<<"[";
-        for (auto iter=this->state_history.begin();
-                  iter != this->state_history.end();
-                  iter++) {
-            cout<<*iter<<" ,";
-        }
-        cout<<"]\n";
-        return;
-    }
-    */
-
 };
 
 
