@@ -23,6 +23,7 @@ public:
     double cur_ep;
     double cur_sp;
     double cur_atk;
+    bool is_dead;
     int encouraged;
     int shell;
     double get_base_hp() {

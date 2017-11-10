@@ -59,9 +59,9 @@ public:
         // init each players
         //
       
-        player* estelle_gamer = new player(2000.0, 200.0, 0.0, 200.0);
+        player* estelle_gamer = new player(2000.0, 400.0, 0.0, 200.0);
         player* joshua_gamer = new player(1800.0, 0.0, 0.0, 300.0);
-        player* leon_gamer = new player(20000.0, 0.0, 0.0, 500.0);
+        player* leon_gamer = new player(7000.0, 0.0, 0.0, 500.0);
 
         vector<action*> estelle_actions = {
             new action(estelle_gamer, {leon_gamer}, new normal_atk()),
@@ -109,10 +109,10 @@ public:
 
     bool is_terminal(){
 
-        if (this->estelle->gamer->cur_hp <= 0 && this->joshua->gamer->cur_hp <= 0) {
+        if (this->estelle->gamer->is_dead && this->joshua->gamer->is_dead) {
             return true;
         }
-        if (this->leon->gamer->cur_hp <= 0) {
+        if (this->leon->gamer->is_dead) {
             return true;
         }
         return false;
@@ -125,9 +125,14 @@ public:
             iter != cur_status->actions.end();
             iter++) {
             auto action_ = *iter;
-            if (action_->motion->is_avaible(cur_status->gamer) == true) {
+            if (action_->motion->is_avaible(cur_status->gamer, action_->target) == true) {
                 cur_status->avaible_actions.push_back(action_);
             }
+        }
+        if (cur_status->avaible_actions.size() == 0) {
+            cout<<"[WARNING... Not Avaible acions found!!!!]"<<endl;
+            action* bottom_action = new action(cur_status->gamer, {}, new bottom_move());
+            cur_status->avaible_actions.push_back(bottom_action);
         }
         return;
     }
@@ -160,6 +165,18 @@ public:
         }
 
         
+    }
+
+    void check_alive() {
+        if (this->estelle->gamer->cur_hp <= 0) {
+            this->estelle->gamer->is_dead = true;
+        }
+        if (this->joshua->gamer->cur_hp <= 0) {
+            this->joshua->gamer->is_dead = true;
+        }
+        if (this->leon->gamer->cur_hp <= 0) {
+            this->leon->gamer->is_dead = true;
+        }
     }
 
     void print_status() {
@@ -245,14 +262,33 @@ public:
 int main() {
 
     cout<<"start"<<endl;
-    srand((unsigned)time(0)); 
-    legend_state* cur_state = new legend_state();    
-    while (cur_state->is_over == false) {
+    
+    
+    int hero_win_num = 0;
+    int boss_win_num = 0;
+    int avg_depth = 0;
+    srand((unsigned)time(0));     
+    for (int epoch = 0; epoch < 10000; epoch ++) {
+        legend_state* cur_state = new legend_state();  
+        while (cur_state->is_over == false) {
+            cur_state->check_alive();            
+            cur_state->pprint_state();
+            cur_state = cur_state->gen_next_state();
+            avg_depth += 1;
+            //usleep(3 * 1000000);
+        }
         cur_state->pprint_state();
-        cur_state = cur_state->gen_next_state();
-        usleep(3 * 1000000);
+        cout<<"leon' final hp"<<cur_state->leon->gamer->cur_hp<<endl<<endl<<endl;
+        if (cur_state->leon->gamer->cur_hp <= 0) {
+            hero_win_num += 1;
+        } else {
+            boss_win_num += 1;
+        }
     }
-    cur_state->pprint_state();
+    cout<<"hero_win: "<<hero_win_num<<" boss_win: "<<boss_win_num<<endl;
+    cout<<"avg depth"<<(avg_depth / 1000)<<endl;
+
+    
     
 }
 

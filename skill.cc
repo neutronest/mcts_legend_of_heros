@@ -19,11 +19,26 @@ class skill {
 public:
     string name;
 
-    virtual void apply(player* caster, vector<player*> players) = 0;
+    virtual void apply(player* caster, vector<player*> target) = 0;
 
-    virtual bool is_avaible(player* caster) = 0;
+    virtual bool is_avaible(player* caster, vector<player*> target) = 0;
 };
 
+
+class bottom_move : public skill {
+public:
+    bottom_move() {
+        this->name = "什么也不干!";
+    }
+
+    void apply(player* caster, vector<player*> target) {
+
+    }
+
+    bool is_avaible(player* caster, vector<player*> target) {
+        return true;
+    }
+};
 
 class normal_atk : public skill {
 public:
@@ -31,14 +46,14 @@ public:
         this->name = "普通攻击！";
     }
 
-    void apply(player* caster, vector<player*> players) {
+    void apply(player* caster, vector<player*> target) {
 
-        if (players.size() != 1) {
+        if (target.size() != 1) {
             cout<<"[WARNING..normal atk must be only one]"<<endl;
             return;
         }
         
-        auto p = players[0];
+        auto p = target[0];
         if (p->shell > 0) {
             p->shell -= 1;
             return;
@@ -47,7 +62,11 @@ public:
         caster->cur_sp = fmin(200, caster->cur_sp+10);
     }
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
+        auto p = target[0];
+        if (p->is_dead == true) {
+            return false;
+        }
         return true;
     }
 };
@@ -58,15 +77,15 @@ public:
         this->name = "大家加油啊！";
     }
 
-    void apply(player* caster, vector<player*> players) {
+    void apply(player* caster, vector<player*> target) {
 
         if (caster->cur_ep < 60) {
             cout<<"[WARNING... estelle_encouage has not enough ep]"<<endl;
             return;
         }
 
-        for (auto iter = players.begin();
-             iter != players.end();
+        for (auto iter = target.begin();
+             iter != target.end();
              iter++) {
             auto p = *iter;
             p->encouraged = 3;
@@ -75,7 +94,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
         if (caster->cur_ep < 60) {
             return false;
         }
@@ -89,23 +108,23 @@ public:
         this->name = "小回复！";
     }
 
-    void apply(player* caster, vector<player*> players) {
-        if (players.size() != 1) {
-            cout<<"[WARNING.. the players'num of es's heal small must be only one]"<<endl;
+    void apply(player* caster, vector<player*> target) {
+        if (target.size() != 1) {
+            cout<<"[WARNING.. the target'num of es's heal small must be only one]"<<endl;
             return;
         }
         if (caster->cur_ep < 30) {
             cout<<"[WARNING..estelle_heal_small but ep < 30]"<<endl;
             return;
         }
-        player* p = players[0];
+        player* p = target[0];
         p->cur_hp = fmin(p->get_base_hp(), p->cur_hp + 1200);
         caster->cur_ep -= 30;
     }
 
     
-    bool is_avaible(player* caster) {
-        if (caster->cur_ep < 30) {
+    bool is_avaible(player* caster, vector<player*> target) {
+        if (caster->cur_ep < 30 || target[0]->is_dead == true) {
             return false;
         }
         return true;
@@ -119,15 +138,15 @@ public:
         this->name = "风之愈！";
     }
 
-    void apply(player* caster, vector<player*> players)  {
+    void apply(player* caster, vector<player*> target)  {
 
         if (caster->cur_ep < 60) {
             cout<<"[WARNING..estelle_heal_all but ep < 60]"<<endl;
             return;
         }
 
-        for(auto iter = players.begin();
-            iter != players.end();
+        for(auto iter = target.begin();
+            iter != target.end();
             iter++) {
             auto p = *iter;
             p->cur_hp = fmin(p->get_base_hp(), p->cur_hp + 1500);
@@ -136,7 +155,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
         if (caster->cur_ep < 60) {
             return false;
         }
@@ -150,14 +169,14 @@ public:
         this->name = "大地之墙！";
     }
 
-    void apply(player* caster, vector<player*> players) {
+    void apply(player* caster, vector<player*> target) {
 
         if (caster->cur_ep < 80) {
             cout<<"[WARNING... estelle_shell_all but ep < 80]"<<endl;
         }
 
-        for(auto iter = players.begin();
-            iter != players.end();
+        for(auto iter = target.begin();
+            iter != target.end();
             iter++) {
             auto p = *iter;
             p->shell = 1;
@@ -166,7 +185,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
         if (caster->cur_ep < 80) {
             return false;
         }
@@ -184,17 +203,17 @@ public:
         this->name = "双连击！";
     }
 
-    void apply(player* caster, vector<player*> players) {
+    void apply(player* caster, vector<player*> target) {
         if (caster->cur_sp < 30) {
             cout<<"[WARNING... joshua_double_atk but sp < 30]"<<endl;
             return;
         }
 
-        if (players.size() != 1) {
+        if (target.size() != 1) {
             cout<<"[WARNING... joshua_double_atk but enemy must be only one]"<<endl;
             return;
         }
-        auto p = players[0];
+        auto p = target[0];
 
         if (p->shell > 0) {
             p->shell -= 1;
@@ -209,7 +228,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
 
         if (caster->cur_sp < 30) {
             return false;
@@ -224,14 +243,14 @@ public:
         this->name = "秘技-幻影奇袭！";
     }
 
-    void apply(player* caster, vector<player*> players) {
+    void apply(player* caster, vector<player*> target) {
 
         if (caster->cur_sp < 100) {
             cout<<"[WARNING... joshua_smove but sp must >= 100]"<<endl;
         }
 
-        for (auto iter = players.begin();
-             iter != players.end();
+        for (auto iter = target.begin();
+             iter != target.end();
              iter++) {
             auto p = *iter;
             if (p->shell > 0) {
@@ -246,7 +265,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
         
         if (caster->cur_sp < 100) {
             return false;
@@ -264,20 +283,23 @@ public:
         this->name = "暗影剑！";
     }
 
-    void apply(player* caster, vector<player*> players) {
+    void apply(player* caster, vector<player*> target) {
 
-        if (players.size() != 1) {
+        if (target.size() != 1) {
 
             cout<<"leon_shadow_atk but target must be only one!"<<endl;
             return;
         }
 
-        auto p = players[0];
+        auto p = target[0];
         p->cur_hp = fmax(0, p->cur_hp - 1.6 * caster->cur_atk);
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
+        if (target[0]->is_dead == true) {
+            return false;
+        }
         return true;
     }
 };
@@ -289,10 +311,10 @@ public:
         this->name = "鬼炎斩！";
     }
 
-    void apply(player* caster, vector<player*> players) {
+    void apply(player* caster, vector<player*> target) {
         
-        for (auto iter = players.begin();
-             iter != players.end();
+        for (auto iter = target.begin();
+             iter != target.end();
              iter++) {
             auto p = *iter;
             p->cur_hp = fmax(0, p->cur_hp - 0.8 * caster->cur_atk);
@@ -300,7 +322,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
         return true;
     }
 };
@@ -313,12 +335,12 @@ public:
         this->name = "修罗之怒！";
     }
 
-    void apply(player* caster, vector<player*> players) {
+    void apply(player* caster, vector<player*> target) {
         caster->encouraged = 3;
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
         return true;
     }
 };
@@ -330,12 +352,12 @@ public:
         this->name = "大地之障·改";
     }
 
-    void apply(player* caster, vector<player*> players){
+    void apply(player* caster, vector<player*> target){
         caster->shell = 2;
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
         return true;
     }
 };
@@ -346,10 +368,10 @@ public:
         this->name = "S-冥皇击！";
     }
 
-    void apply(player* caster, vector<player*> players) {
+    void apply(player* caster, vector<player*> target) {
 
-        for (auto iter = players.begin();
-             iter != players.end();
+        for (auto iter = target.begin();
+             iter != target.end();
              iter++) {
             
             auto p = *iter;
@@ -363,7 +385,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster) {
+    bool is_avaible(player* caster, vector<player*> target) {
         return true;
     }
 };
