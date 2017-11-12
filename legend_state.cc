@@ -61,7 +61,7 @@ public:
       
         player* estelle_gamer = new player(2000.0, 400.0, 0.0, 200.0);
         player* joshua_gamer = new player(1800.0, 0.0, 0.0, 300.0);
-        player* leon_gamer = new player(7000.0, 0.0, 0.0, 500.0);
+        player* leon_gamer = new player(10000.0, 0.0, 0.0, 500.0);
 
         vector<action*> estelle_actions = {
             new action(estelle_gamer, {leon_gamer}, new normal_atk()),
@@ -268,7 +268,7 @@ int main() {
     int boss_win_num = 0;
     int avg_depth = 0;
     srand((unsigned)time(0));     
-    for (int epoch = 0; epoch < 10000; epoch ++) {
+    for (int epoch = 0; epoch < 1000; epoch ++) {
         legend_state* cur_state = new legend_state();  
         while (cur_state->is_over == false) {
             cur_state->check_alive();            
