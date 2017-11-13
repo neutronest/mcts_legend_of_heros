@@ -72,9 +72,8 @@ public:
     gamer_status* estelle = new gamer_status();
     gamer_status* joshua = new gamer_status();
     gamer_status* leon = new gamer_status();
-    legend_turn cur_turn = legend_turn::E;
+    legend_turn cur_turn = legend_turn::E; // each game starts with estelle's turn.
     bool is_over = false;
-
 
 
     legend_state() {
@@ -170,7 +169,7 @@ public:
             cur_status = this->leon;
         }
 
-        retun cur_status;
+        return cur_status;
     }
 
 
@@ -289,8 +288,35 @@ public:
         return -1;
     }
 
+    // encoding the state's information to string
+    // can distinguish diff state's by their encoding result
+    // encoding format:
+    //   E-HP2000|EP200|SP0|Sh1|En1|J-JP1800|EP0|SP200|Sh1|En1|L-...
+    string get_gamer_encoding(player* gamer) {
+
+        string hp = to_string(int(gamer->cur_hp));
+        string ep = to_string(int(gamer->cur_ep));
+        string sp = to_string(int(gamer->cur_sp));
+        string sh = to_string(int(gamer->shell));
+        string en = to_string(int(gamer->encouraged));
+        string res = "";
+        res = "HP" + hp + "|EP" + ep + "|SP" + sp + "|Sh" + sh + "|En" + en;
+        return res;
+    }
+
+
+
     string get_encoding() {
-        return "";
+        
+        player* estelle_gamer = this->estelle->gamer;
+        player* joshua_gamer = this->joshua->gamer;
+        player* leon_gamer = this->leon->gamer;
+
+        string estelle_encode = this->get_gamer_encoding(estelle_gamer);
+        string joshua_encode = this->get_gamer_encoding(joshua_gamer);
+        string leon_encode = this->get_gamer_encoding(leon_gamer);
+        string encode_str = "|E-" + estelle_encode + "|J-" + joshua_encode + "|L-" + leon_encode;
+        return encode_str;
     }
     double get_reward() {
         return 0.0;
@@ -314,6 +340,7 @@ int main() {
         while (cur_state->is_over == false) {
             cur_state->check_alive();            
             cur_state->pprint_state();
+            cout<<cur_state->get_encoding()<<endl;
             cur_state = cur_state->gen_next_state();
             avg_depth += 1;
             //usleep(3 * 1000000);
