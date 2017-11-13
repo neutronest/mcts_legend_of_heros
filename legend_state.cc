@@ -16,9 +16,19 @@
 
 using namespace std;
 
-
+// to denote estelle, joshua and leon's turn
+// E: estelle, J: joshua, L:leon
 enum class legend_turn {E, J, L};
 
+// the basic action definite for reinforcement learning
+// caster: the initiative side to make the action
+// target: the interactive side, may be more then one.
+// one action, one skill.
+// 
+// always be the components of gamer_status 
+//
+// Example:
+// auto ac = new action(leon_gamer, {estelle_gamer, joshua_gamer}, new leon_shadow_atk())
 class action {
 public:
     player* caster;
@@ -32,6 +42,19 @@ public:
     }
 };
 
+// recording one player's status (for the whole game state)
+// name: the player's name, estelle, joshua, or leon
+// gamer: the player's basic object 
+//        which maintain the orginal and current attribute of player,
+//        such as hp, ep, sp, atk...
+// actions: the action set that this player can used originally
+//          include skill object and target players
+//          same skill but different targets can be regard as different acions.
+//          only mutable at init, immutable
+// avaible_actions: the avaible action set in current time, 
+//                  some actions (such as magic) have restrict, enough ep, sp etc., 
+//                  filtered only by is_avaible func in skill.cc
+//                  mutable and update in each state
 class gamer_status {
 
 public:
@@ -118,7 +141,7 @@ public:
         return false;
     }
 
-    void get_avaible_actions(gamer_status* cur_status) {
+    void set_avaible_actions(gamer_status* cur_status) {
 
         cur_status->avaible_actions = {};
         for(auto iter = cur_status->actions.begin();
@@ -135,6 +158,26 @@ public:
             cur_status->avaible_actions.push_back(bottom_action);
         }
         return;
+    }
+
+    gamer_status* get_cur_status() {
+        gamer_status* cur_status = nullptr;
+        if (this->cur_turn == legend_turn::E) {
+            cur_status = this->estelle;
+        } else if (this->cur_turn == legend_turn::J) {
+            cur_status = this->joshua;
+        } else {
+            cur_status = this->leon;
+        }
+
+        retun cur_status;
+    }
+
+
+    int get_available_state_limit() {
+        
+        gamer_status* cur_status = this->get_cur_status();
+        return cur_status->avaible_actions.size();
     }
 
     void get_next_turn() {
@@ -203,7 +246,7 @@ public:
 
 
         cout<<cur_status->name<<"'s turn: "<<endl;
-        this->get_avaible_actions(cur_status);
+        this->set_avaible_actions(cur_status);
         int len_of_avaible_actions = cur_status->avaible_actions.size();
         
         int r = rand() % len_of_avaible_actions;
@@ -245,9 +288,7 @@ public:
     int get_state_limit() {
         return -1;
     }
-    int get_available_state_limit() {
-        return -1;
-    }
+
     string get_encoding() {
         return "";
     }

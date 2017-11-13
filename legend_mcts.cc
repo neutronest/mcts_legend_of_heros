@@ -20,11 +20,21 @@ class legend_mcts {
     double q_value;
 
     legend_mcts() {
-
+        this->parent = nullptr;
+        this->children = {};
+        this->game_state = nullptr;
+        this->visit_times = 0;
+        this->q_value = 0.0;
     }
 
     bool is_all_expand() {
         
+        if (this->game_state == nullptr) {
+            cout<<"[WARNING... legend_mcts,is_all_expand: game_state is nullptr]"<<endl;
+            return false;
+        }
+
+        int cur_avaible_action_num = this->game_state->get_available_state_limit();
         return false;
     }
 
