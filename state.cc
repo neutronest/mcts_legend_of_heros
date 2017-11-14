@@ -29,6 +29,7 @@ public:
     virtual bool is_terminal() = 0;
     virtual double get_reward() = 0;
     virtual void pprint() = 0;
+    virtual bool is_boss_turn() = 0;
 
 
     /*

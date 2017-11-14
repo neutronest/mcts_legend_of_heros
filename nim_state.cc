@@ -84,3 +84,7 @@ void nim_state::pprint() {
     cout<<"]\n";
     return;
 }
+
+bool nim_state::is_boss_turn() {
+    return false;
+}

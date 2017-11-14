@@ -125,8 +125,27 @@ public:
         leon->gamer = leon_gamer;
         leon->actions = leon_actions;
         leon->avaible_actions = {};
-        cur_turn = legend_turn::E;
+
+
+        this->cur_turn = legend_turn::E;
+        auto cur_status = this->get_status_by_turn();
+        this->set_avaible_actions(cur_status);
+
         is_over = false;
+    }
+
+    gamer_status* get_status_by_turn() {
+        
+        gamer_status* cur_status = nullptr;        
+        if (this->cur_turn == legend_turn::E) {
+            cur_status = this->estelle;
+        } else if (this->cur_turn == legend_turn::J) {
+            cur_status = this->joshua;
+        } else {
+            cur_status = this->leon;
+        } 
+        return cur_status;
+           
     }
 
     bool is_terminal(){
@@ -179,7 +198,7 @@ public:
         return cur_status->avaible_actions.size();
     }
 
-    void get_next_turn() {
+    legend_turn get_next_turn() {
 
         bool is_estelle_dead = this->estelle->gamer->cur_hp > 0 ? false : true;
         bool is_joshua_dead = this->joshua->gamer->cur_hp > 0 ? false : true;
@@ -189,20 +208,20 @@ public:
         if (this->cur_turn == legend_turn::E) {
 
             if(is_joshua_dead == false) {
-                this->cur_turn = legend_turn::J;
+                return legend_turn::J;
             } else if (is_leon_dead == false){
-                this->cur_turn = legend_turn::L;
+                return legend_turn::L;
             }
         } else if (this->cur_turn == legend_turn::J) {
             if (is_leon_dead == false) {
-                this->cur_turn = legend_turn::L;
+                return legend_turn::L;
             } // else means game win
         } else {
             // this->cur_turn == legend_turn::L
             if (is_estelle_dead == false) {
-                this->cur_turn = legend_turn::E;
+                return legend_turn::E;
             } else if (is_joshua_dead == false) {
-                this->cur_turn = legend_turn::J;
+                return legend_turn::J;
             } // else gamer over
         }
 
@@ -227,6 +246,37 @@ public:
 
     }
 
+    legend_state* gen_next_state() {
+
+        
+
+        gamer_status* cur_status = this->get_status_by_turn();        
+        if (cur_status->gamer->encouraged > 0) {
+            cur_status->gamer->cur_atk = 1.5 * cur_status->gamer->get_base_atk();
+            cur_status->gamer->encouraged -= 1;
+        }
+        cout<<cur_status->name<<"'s turn: "<<endl;
+        int len_of_avaible_actions = cur_status->avaible_actions.size();
+        int r = rand() % len_of_avaible_actions;
+        action* cur_action = cur_status->avaible_actions[r];
+        cur_action->motion->apply(cur_action->caster, cur_action->target);
+        cout<<cur_status->name<<"使用了 "<<cur_action->motion->name<<" ..."<<endl;
+        cout<<"----------"<<endl;
+        
+        this->check_alive();        
+        if (this->is_terminal()) {
+            this->is_over = true;
+            cout<<"游戏结束!!!!"<<endl;
+            return this;
+        }
+
+        legend_state* next_state = new legend_state(*this);        
+        next_state->cur_turn = this->get_next_turn();
+        next_state->set_avaible_actions(next_state->get_status_by_turn());
+        return next_state;
+
+    }
+    /*
     legend_state* gen_next_state() {
         
         gamer_status* cur_status = nullptr;
@@ -263,6 +313,7 @@ public:
         cout<<"----------"<<endl;
         return this;
     }
+    */
 
     void pprint_state() {
         // print information of each player
@@ -318,14 +369,31 @@ public:
         string encode_str = "|E-" + estelle_encode + "|J-" + joshua_encode + "|L-" + leon_encode;
         return encode_str;
     }
-    double get_reward() {
-        return 0.0;
-    }
-    void pprint() {
 
+
+    // reward = -| 0 - leon->cur_hp()) / 1000.0|
+    // for example, if player debeat the boss, then reward = -|-0 - 0| = 0
+    // if player failed but boss 5000 hp left, then reward = - |-5000/1000| = -5
+    // reward's range: [-20, 0]
+    double get_reward() {
+        return - abs(0 - this->leon->gamer->cur_hp);
+    }
+
+
+    bool is_boss_turn() {
+        if (this->cur_turn == legend_turn::L) {
+            return true;
+        }
+        return false;
+    }
+
+    void pprint() {
+        this->pprint_state();
     }
 };
 
+
+/*
 int main() {
 
     cout<<"start"<<endl;
@@ -338,7 +406,6 @@ int main() {
     for (int epoch = 0; epoch < 1000; epoch ++) {
         legend_state* cur_state = new legend_state();  
         while (cur_state->is_over == false) {
-            cur_state->check_alive();            
             cur_state->pprint_state();
             cout<<cur_state->get_encoding()<<endl;
             cur_state = cur_state->gen_next_state();
@@ -356,7 +423,6 @@ int main() {
     cout<<"hero_win: "<<hero_win_num<<" boss_win: "<<boss_win_num<<endl;
     cout<<"avg depth"<<(avg_depth / 1000)<<endl;
 
-    
-    
-}
 
+}
+*/
