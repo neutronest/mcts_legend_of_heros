@@ -17,18 +17,18 @@ public:
     int shell;
 
     double get_base_hp();
-    void set_base_hp();
+    void set_base_hp(double hp);
 
     double get_base_ep();
-    void set_base_ep();
+    void set_base_ep(double ep);
 
     double get_base_sp();
-    void set_base_sp();
+    void set_base_sp(double sp);
 
     double get_base_atk();
-    void set_base_atk();
+    void set_base_atk(double atk);
 
-    player(int hp, int ep, int sp, int atk);
+    player(double hp, double ep, double sp, double atk);
 };
 
 #endif

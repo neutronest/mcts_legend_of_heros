@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <map>
 
-#include "state.cc"
+#include "state.h"
 
 using namespace std;
 

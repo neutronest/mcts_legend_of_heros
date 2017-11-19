@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <state.h>
+#include "state.h"
 
 using namespace std;
 
@@ -30,5 +30,5 @@ public:
     void backprop(double reward);
 
     mcts_node* main_search();
-}
+};
 #endif

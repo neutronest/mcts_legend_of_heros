@@ -17,6 +17,12 @@ public:
     virtual bool is_available(player* caster, vector<player*> target) = 0;
 };
 
+class bottom_move : public skill {
+public:
+    bottom_move();
+    void apply(player* caster, vector<player*> target);
+    bool is_available(player* caster, vector<player*> target);
+};
 
 class normal_atk : public skill {
 public:

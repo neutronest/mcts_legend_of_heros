@@ -19,7 +19,7 @@ public:
 
     legend_mcts* expand_node();
 
-    legend_mcts* get_best_child();
+    legend_mcts* get_best_child(int is_exploration);
 
     double default_policy();
 
