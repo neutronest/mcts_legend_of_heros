@@ -18,6 +18,7 @@ class skill {
 
 public:
     string name;
+    
 
     virtual void apply(player* caster, vector<player*> target) = 0;
 
@@ -35,7 +36,7 @@ public:
 
     }
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         return true;
     }
 };
@@ -62,7 +63,7 @@ public:
         caster->cur_sp = fmin(200, caster->cur_sp+10);
     }
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         auto p = target[0];
         if (p->is_dead == true) {
             return false;
@@ -94,7 +95,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         if (caster->cur_ep < 60) {
             return false;
         }
@@ -123,7 +124,7 @@ public:
     }
 
     
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         if (caster->cur_ep < 30 || target[0]->is_dead == true) {
             return false;
         }
@@ -155,7 +156,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         if (caster->cur_ep < 60) {
             return false;
         }
@@ -185,7 +186,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         if (caster->cur_ep < 80) {
             return false;
         }
@@ -228,7 +229,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
 
         if (caster->cur_sp < 30) {
             return false;
@@ -265,7 +266,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         
         if (caster->cur_sp < 100) {
             return false;
@@ -296,7 +297,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         if (target[0]->is_dead == true) {
             return false;
         }
@@ -322,7 +323,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         return true;
     }
 };
@@ -340,7 +341,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         return true;
     }
 };
@@ -357,7 +358,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         return true;
     }
 };
@@ -385,7 +386,7 @@ public:
     }
 
 
-    bool is_avaible(player* caster, vector<player*> target) {
+    bool is_available(player* caster, vector<player*> target) {
         return true;
     }
 };

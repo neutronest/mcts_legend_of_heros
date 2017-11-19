@@ -7,6 +7,7 @@
 #include <cmath>
 
 //#include "state.cc"
+#include "mcts.h"
 #include "nim_state.cc"
 
 using namespace std;
@@ -52,7 +53,7 @@ public:
         vector<string> child_state_encodings;
         
         for (auto child = this->children.begin(); child != this->children.end(); child++) {
-            child_state_encodings.push_back( (*child)->game_state->get_encoding());
+            child_state_encodings.push_back((*child)->game_state->get_encoding());
         }
 
         state* new_state = this->game_state->gen_next_state();

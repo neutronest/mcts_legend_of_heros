@@ -10,9 +10,9 @@
 
 
 #pragma once
-#include "state.cc"
-#include "player.cc"
-#include "skill.cc"
+#include "state.h"
+#include "player.h"
+#include "skill.h"
 
 using namespace std;
 
@@ -393,7 +393,7 @@ public:
 };
 
 
-/*
+
 int main() {
 
     cout<<"start"<<endl;
@@ -425,4 +425,4 @@ int main() {
 
 
 }
-*/
+
