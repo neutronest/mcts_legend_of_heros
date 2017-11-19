@@ -179,7 +179,7 @@ public:
     }
 
 };
-
+/*
 int main() {
 
     nim_state* root_state = new nim_state(0);
@@ -206,3 +206,4 @@ int main() {
     return 1;
 
 }
+*/
