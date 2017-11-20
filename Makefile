@@ -16,7 +16,7 @@ MAIN = player.cc \
 	main.cc
 
 
-CCFLAGS = -g -Wall -std=c++11 -I $(HEADER)
+CCFLAGS = -g -Wall -std=c++11 
 
 OBJS = player.o \
 	skill.o \

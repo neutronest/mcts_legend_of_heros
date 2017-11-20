@@ -48,8 +48,8 @@ legend_mcts* legend_mcts::expand_node() {
 
     state* new_state = this->game_state->gen_next_state();
     while (std::find(child_state_encodings.begin(), 
-        child_state_encodings.end(),
-        new_state->get_encoding()) != child_state_encodings.end() ) {
+                     child_state_encodings.end(),
+                     new_state->get_encoding()) != child_state_encodings.end() ) {
         // 
         new_state = this->game_state->gen_next_state();
     }
@@ -112,9 +112,10 @@ double legend_mcts::default_policy() {
 legend_mcts* legend_mcts::tree_policy()  {
     // selection and expansion
     auto node = this;
+    cout<<this->game_state->get_encoding()<<endl;
     while (node->game_state->is_terminal() == false) {
 
-        cout<<this->game_state->get_encoding()<<endl;
+        //cout<<this->game_state->get_encoding()<<endl;
         if (node->is_all_expand()) {
             cout<<"all expand..."<<endl;
             // check if boss' turn
@@ -152,10 +153,8 @@ void legend_mcts::backprop(double reward) {
 legend_mcts* legend_mcts::main_search(int computation_budge) {
 
     for (int d = 0; d < computation_budge; d++) {
-        
-        cout<<"1"<<endl;
+        cout<<"budge: "<<d<<endl;
         legend_mcts* leaf_node = this->tree_policy();
-        cout<<"2"<<endl;
         //cout<<"budge idx: "<<d<<" tree policy finished"<<endl;
         double reward = leaf_node->default_policy();
         //cout<<"budge idx: "<<d<<" default policy finished"<<endl;

@@ -26,6 +26,7 @@ public:
     vector<player*> target;
     skill* motion;
     action(player* caster_, vector<player*> target_, skill* motion_);
+    action* dcopy();
 
 };
 
@@ -49,6 +50,7 @@ public:
     vector<action*> actions;
     vector<action*> available_actions;
 
+    gamer_status* dcopy();
 };
 
 
@@ -61,6 +63,8 @@ public:
     bool is_over = false;
 
     legend_state();
+
+    legend_state* dcopy();
 
     gamer_status* get_status_by_turn();
 

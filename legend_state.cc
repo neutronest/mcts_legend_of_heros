@@ -24,6 +24,48 @@ action::action(player* caster_, vector<player*> target_, skill* motion_) {
     this->motion = motion_;
 }
 
+action* action::dcopy() {
+
+    player* caster_ = this->caster->dcopy();
+    vector<player*> target_ = {};
+    for (auto iter = this->target.begin();
+              iter != this->target.end();
+              iter++) {
+
+        auto p = *iter;
+        target_.push_back(p->dcopy());
+    }
+    // skill shared!!!
+    skill* motion_ = this->motion;
+    
+    action* new_action = new action(caster_, target_, motion_);
+    return new_action;
+
+}
+
+///////////////////
+//// gamer_status
+///////////////////
+
+gamer_status* gamer_status::dcopy() {
+
+
+    gamer_status* new_status = new gamer_status();
+    new_status->name = this->name;
+    new_status->gamer = this->gamer->dcopy();
+    new_status->actions = {};
+    for (auto iter = this->actions.begin();
+              iter != this->actions.end();
+              iter++) {
+                  
+        auto action = *iter;
+        new_status->actions.push_back(action->dcopy());          
+    }
+    new_status->available_actions = {};
+    return new_status;
+}
+
+
 ////////////////
 // legend_state
 ////////////////
@@ -84,6 +126,23 @@ legend_state::legend_state() {
 
     is_over = false;
 }
+
+legend_state* legend_state::dcopy(){
+    
+    legend_state* new_state = new legend_state();
+    new_state->estelle = this->estelle->dcopy();
+    new_state->joshua = this->joshua->dcopy();
+    new_state->leon = this->leon->dcopy();
+    new_state->cur_turn = this->cur_turn;
+    new_state->is_over = this->is_over;
+
+    cout<<"test..estelle's hp: "<<new_state->estelle->gamer->cur_hp<<endl;
+    
+    return new_state;
+
+}
+
+
 
 gamer_status* legend_state::get_status_by_turn() {
     
@@ -200,8 +259,9 @@ void legend_state::print_status() {
 
 legend_state* legend_state::gen_next_state() {
 
+    // TODO
+    this->pprint_state();
     
-
     gamer_status* cur_status = this->get_status_by_turn();        
     if (cur_status->gamer->encouraged > 0) {
         cur_status->gamer->cur_atk = 1.5 * cur_status->gamer->get_base_atk();
@@ -222,7 +282,7 @@ legend_state* legend_state::gen_next_state() {
         return this;
     }
 
-    legend_state* next_state = new legend_state(*this);        
+    legend_state* next_state = this->dcopy();        
     next_state->cur_turn = this->get_next_turn();
     next_state->set_available_actions(next_state->get_status_by_turn());
     return next_state;

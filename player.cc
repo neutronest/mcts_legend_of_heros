@@ -57,4 +57,22 @@ player::player(double hp, double ep, double sp, double atk) {
     this->shell = 0;
     
 }
+
+player* player::dcopy() {
+
+    player* new_player = new player(0, 0, 0, 0);
+    new_player->base_hp = this->base_hp;
+    new_player->base_ep = this->base_ep;
+    new_player->base_sp = this->base_sp;
+    new_player->base_atk = this->base_atk;
+
+    new_player->cur_hp = this->cur_hp;
+    new_player->cur_ep = this->cur_ep;
+    new_player->cur_sp = this->cur_sp;
+    new_player->cur_atk = this->cur_atk;
+    new_player->encouraged = this->encouraged;
+    new_player->shell = this->shell;
+    cout<<"player'hp: "<<cur_hp<<endl;
+    return new_player;
+}
     

@@ -29,6 +29,8 @@ public:
     void set_base_atk(double atk);
 
     player(double hp, double ep, double sp, double atk);
+
+    player* dcopy();
 };
 
 #endif
