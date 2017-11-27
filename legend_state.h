@@ -62,14 +62,12 @@ public:
     legend_turn cur_turn = legend_turn::E; // each game starts with estelle's turn.
     bool is_over = false;
 
-    legend_state();
+    void start();
+
+    void init(player* estelle_gamer, player* joshua_gamer, player* leon_gamer, legend_turn cur_turn);
 
     legend_state* dcopy();
-
-    gamer_status* get_status_by_turn();
-
-    bool is_terminal();
-
+    
     void set_available_actions(gamer_status* cur_status);
 
     gamer_status* get_cur_status();
@@ -78,13 +76,7 @@ public:
 
     legend_turn get_next_turn();
 
-    void check_alive();
-
-    void print_status();
-
     legend_state* gen_next_state();
-
-    void pprint_state();
 
     bool simulate_default_policy();
 
@@ -96,9 +88,17 @@ public:
 
     double get_reward();
 
+    bool is_terminal();    
+
+    void check_alive();    
+
     bool is_boss_turn();
 
     void pprint();
+
+    void pprint_state();
+
+    void print_status();
 };
 
 #endif

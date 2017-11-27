@@ -69,14 +69,20 @@ gamer_status* gamer_status::dcopy() {
 ////////////////
 // legend_state
 ////////////////
-legend_state::legend_state() {
+
+void legend_state::start() {
+
+    player* estelle_gamer = new player(2000.0, 400.0, 0.0, 200.0);
+    player* joshua_gamer = new player(1800.0, 0.0, 0.0, 300.0);
+    player* leon_gamer = new player(20000.0, 0.0, 0.0, 500.0);
+    this->init(estelle_gamer, joshua_gamer, leon_gamer, legend_turn::E);
+    return;
+}
+
+void legend_state::init(player* estelle_gamer, player* joshua_gamer, player* leon_gamer, legend_turn turn) {
     
     // init each players
     //
-  
-    player* estelle_gamer = new player(2000.0, 400.0, 0.0, 200.0);
-    player* joshua_gamer = new player(1800.0, 0.0, 0.0, 300.0);
-    player* leon_gamer = new player(10000.0, 0.0, 0.0, 500.0);
 
     vector<action*> estelle_actions = {
         new action(estelle_gamer, {leon_gamer}, new normal_atk()),
@@ -120,8 +126,8 @@ legend_state::legend_state() {
     leon->available_actions = {};
 
 
-    this->cur_turn = legend_turn::E;
-    auto cur_status = this->get_status_by_turn();
+    this->cur_turn = turn;
+    auto cur_status = this->get_cur_status();
     this->set_available_actions(cur_status);
 
     is_over = false;
@@ -129,32 +135,14 @@ legend_state::legend_state() {
 
 legend_state* legend_state::dcopy(){
     
-    legend_state* new_state = new legend_state();
-    new_state->estelle = this->estelle->dcopy();
-    new_state->joshua = this->joshua->dcopy();
-    new_state->leon = this->leon->dcopy();
-    new_state->cur_turn = this->cur_turn;
-    new_state->is_over = this->is_over;
+    player* estelle_gamer = this->estelle->gamer->dcopy();
+    player* joshua_gamer = this->joshua->gamer->dcopy();
+    player* leon_gamer = this->leon->gamer->dcopy();
+    legend_turn next_turn = this->get_next_turn();
 
-    cout<<"test..estelle's hp: "<<new_state->estelle->gamer->cur_hp<<endl;
-    
-    return new_state;
-
-}
-
-
-
-gamer_status* legend_state::get_status_by_turn() {
-    
-    gamer_status* cur_status = nullptr;        
-    if (this->cur_turn == legend_turn::E) {
-        cur_status = this->estelle;
-    } else if (this->cur_turn == legend_turn::J) {
-        cur_status = this->joshua;
-    } else {
-        cur_status = this->leon;
-    } 
-    return cur_status;
+    legend_state* next_state = new legend_state();
+    next_state->init(estelle_gamer, joshua_gamer, leon_gamer, next_turn);
+    return next_state;
        
 }
 
@@ -251,18 +239,14 @@ void legend_state::check_alive() {
     }
 }
 
-void legend_state::print_status() {
 
-    
-
-}
 
 legend_state* legend_state::gen_next_state() {
 
     // TODO
     this->pprint_state();
     
-    gamer_status* cur_status = this->get_status_by_turn();        
+    gamer_status* cur_status = this->get_cur_status();        
     if (cur_status->gamer->encouraged > 0) {
         cur_status->gamer->cur_atk = 1.5 * cur_status->gamer->get_base_atk();
         cur_status->gamer->encouraged -= 1;
@@ -284,23 +268,8 @@ legend_state* legend_state::gen_next_state() {
 
     legend_state* next_state = this->dcopy();        
     next_state->cur_turn = this->get_next_turn();
-    next_state->set_available_actions(next_state->get_status_by_turn());
+    next_state->set_available_actions(next_state->get_cur_status());
     return next_state;
-
-}
-
-void legend_state::pprint_state() {
-    // print information of each player
-    // foramt:
-    // estelle- HP-1000 MP-1000 joshua- 
-    int estelle_hp = this->estelle->gamer->cur_hp;
-    int estelle_ep = this->estelle->gamer->cur_ep;
-    int joshua_hp = this->joshua->gamer->cur_hp;
-    int joshua_sp = this->joshua->gamer->cur_sp;
-    int leon_hp = this->leon->gamer->cur_hp;
-    cout<<"艾丝蒂尔- HP:"<<estelle_hp<<" EP: "<<estelle_ep;
-    cout<<"约修亚- HP:"<<joshua_hp<<" SP: "<<joshua_sp;
-    cout<<"剑帝- HP:"<<leon_hp<<endl;
 
 }
 
@@ -363,4 +332,23 @@ bool legend_state::is_boss_turn() {
 
 void legend_state::pprint() {
     this->pprint_state();
+}
+
+void legend_state::print_status() {
+}
+
+
+void legend_state::pprint_state() {
+    // print information of each player
+    // foramt:
+    // estelle- HP-1000 MP-1000 joshua- 
+    int estelle_hp = this->estelle->gamer->cur_hp;
+    int estelle_ep = this->estelle->gamer->cur_ep;
+    int joshua_hp = this->joshua->gamer->cur_hp;
+    int joshua_sp = this->joshua->gamer->cur_sp;
+    int leon_hp = this->leon->gamer->cur_hp;
+    cout<<"艾丝蒂尔- HP:"<<estelle_hp<<" EP: "<<estelle_ep;
+    cout<<"约修亚- HP:"<<joshua_hp<<" SP: "<<joshua_sp;
+    cout<<"剑帝- HP:"<<leon_hp<<endl;
+
 }

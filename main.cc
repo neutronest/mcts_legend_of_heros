@@ -49,6 +49,8 @@ int main() {
         cout<<"avg depth"<<(avg_depth / 1000)<<endl;
         */
         legend_state* root_state = new legend_state();
+        root_state->start();
+        
         legend_mcts* root = new legend_mcts();
         root->q_value = 0.0;
         root->visit_times = 0;
