@@ -43,4 +43,4 @@ legend_mcts.o :
 	$(CLANG) $(CCFLAGS) -c legend_mcts.cc
 
 clean:
-	rm core $(PROG) $(OBJS)
+	rm $(PROG) $(OBJS)

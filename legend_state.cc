@@ -18,7 +18,8 @@ using namespace std;
 //////////
 // action
 //////////
-action::action(player* caster_, vector<player*> target_, skill* motion_) {
+action::action(string action_name_, player* caster_, vector<player*> target_, skill* motion_) {
+    this->action_name = action_name_;
     this->caster = caster_;
     this->target = target_;
     this->motion = motion_;
@@ -38,7 +39,7 @@ action* action::dcopy() {
     // skill shared!!!
     skill* motion_ = this->motion;
     
-    action* new_action = new action(caster_, target_, motion_);
+    action* new_action = new action(this->action_name, caster_, target_, motion_);
     return new_action;
 
 }
@@ -75,22 +76,26 @@ void legend_state::start() {
     player* estelle_gamer = new player(2000.0, 400.0, 0.0, 200.0);
     player* joshua_gamer = new player(1800.0, 0.0, 0.0, 300.0);
     player* leon_gamer = new player(20000.0, 0.0, 0.0, 500.0);
-    this->init(estelle_gamer, joshua_gamer, leon_gamer, legend_turn::E);
+    this->init(estelle_gamer, joshua_gamer, leon_gamer, legend_turn::E, false);
     return;
 }
 
-void legend_state::init(player* estelle_gamer, player* joshua_gamer, player* leon_gamer, legend_turn turn) {
+void legend_state::init(player* estelle_gamer, 
+                        player* joshua_gamer, 
+                        player* leon_gamer, 
+                        legend_turn turn,
+                        bool is_over_) {
     
     // init each players
     //
 
     vector<action*> estelle_actions = {
-        new action(estelle_gamer, {leon_gamer}, new normal_atk()),
-        new action(estelle_gamer, {estelle_gamer, joshua_gamer}, new estelle_encourage()),
-        new action(estelle_gamer, {estelle_gamer}, new estelle_heal_small()),
-        new action(estelle_gamer, {joshua_gamer}, new estelle_heal_small()),
-        new action(estelle_gamer, {estelle_gamer, joshua_gamer}, new estelle_heal_all()),
-        new action(estelle_gamer, {estelle_gamer, joshua_gamer}, new estelle_shell_all())
+        new action("estelle_atk_leon", estelle_gamer, {leon_gamer}, new normal_atk()),
+        new action("estelle_encourage", estelle_gamer, {estelle_gamer, joshua_gamer}, new estelle_encourage()),
+        new action("estelle_small_heal_estelle", estelle_gamer, {estelle_gamer}, new estelle_heal_small()),
+        new action("estelle_small_heal_joshua", estelle_gamer, {joshua_gamer}, new estelle_heal_small()),
+        new action("estelle_heal_all", estelle_gamer, {estelle_gamer, joshua_gamer}, new estelle_heal_all()),
+        new action("estelle_shell_all", estelle_gamer, {estelle_gamer, joshua_gamer}, new estelle_shell_all())
     };
     estelle->name = "艾丝蒂尔";
     estelle->gamer = estelle_gamer;
@@ -98,9 +103,9 @@ void legend_state::init(player* estelle_gamer, player* joshua_gamer, player* leo
     estelle->available_actions = {};
     // joshua
     vector<action*> joshua_actions = {
-        new action(joshua_gamer, {leon_gamer}, new normal_atk()),
-        new action(joshua_gamer, {leon_gamer}, new joshua_double_atk()),
-        new action(joshua_gamer, {leon_gamer}, new joshua_smove())
+        new action("joshua_atk_leon", joshua_gamer, {leon_gamer}, new normal_atk()),
+        new action("joshua_double_atk_leon", joshua_gamer, {leon_gamer}, new joshua_double_atk()),
+        new action("joshua_smove_leon", joshua_gamer, {leon_gamer}, new joshua_smove())
 
     };
     joshua->name = "约修亚";
@@ -110,14 +115,14 @@ void legend_state::init(player* estelle_gamer, player* joshua_gamer, player* leo
 
     // leon
     vector<action*> leon_actions = {
-        new action(leon_gamer, {estelle_gamer}, new normal_atk()),
-        new action(leon_gamer, {joshua_gamer}, new normal_atk()),
-        new action(leon_gamer, {estelle_gamer}, new leon_shadow_atk()),
-        new action(leon_gamer, {joshua_gamer}, new leon_shadow_atk()),
-        new action(leon_gamer, {estelle_gamer, joshua_gamer}, new leon_ghostfire_atk()),
-        new action(leon_gamer, {leon_gamer}, new leon_buff()),
-        new action(leon_gamer, {leon_gamer}, new leon_deep_shell()),
-        new action(leon_gamer, {estelle_gamer, joshua_gamer}, new leon_final_move())
+        new action("leon_atk_estelle", leon_gamer, {estelle_gamer}, new normal_atk()),
+        new action("leon_atk_joshua", leon_gamer, {joshua_gamer}, new normal_atk()),
+        new action("leon_shadow_atk_estelle", leon_gamer, {estelle_gamer}, new leon_shadow_atk()),
+        new action("leon_shadow_atk_joshua", leon_gamer, {joshua_gamer}, new leon_shadow_atk()),
+        new action("leon_ghost_fire_all", leon_gamer, {estelle_gamer, joshua_gamer}, new leon_ghostfire_atk()),
+        new action("leon_buff", leon_gamer, {leon_gamer}, new leon_buff()),
+        new action("leon_deep_shell", leon_gamer, {leon_gamer}, new leon_deep_shell()),
+        new action("leon_final_move", leon_gamer, {estelle_gamer, joshua_gamer}, new leon_final_move())
 
     };
     leon->name = "剑帝";
@@ -129,8 +134,7 @@ void legend_state::init(player* estelle_gamer, player* joshua_gamer, player* leo
     this->cur_turn = turn;
     auto cur_status = this->get_cur_status();
     this->set_available_actions(cur_status);
-
-    is_over = false;
+    this->is_over = is_over_;
 }
 
 legend_state* legend_state::dcopy(){
@@ -138,10 +142,14 @@ legend_state* legend_state::dcopy(){
     player* estelle_gamer = this->estelle->gamer->dcopy();
     player* joshua_gamer = this->joshua->gamer->dcopy();
     player* leon_gamer = this->leon->gamer->dcopy();
-    legend_turn next_turn = this->get_next_turn();
+    legend_turn cur_turn = this->cur_turn;
+    bool is_over = this->is_over;
+    //cout<<"Debug1";
 
     legend_state* next_state = new legend_state();
-    next_state->init(estelle_gamer, joshua_gamer, leon_gamer, next_turn);
+    //cout<<"Debug2";
+    next_state->init(estelle_gamer, joshua_gamer, leon_gamer, cur_turn, is_over);
+    //cout<<"Debug3";
     return next_state;
        
 }
@@ -170,9 +178,13 @@ void legend_state::set_available_actions(gamer_status* cur_status) {
     }
     if (cur_status->available_actions.size() == 0) {
         cout<<"[WARNING... Not Available acions found!!!!]"<<endl;
-        action* bottom_action = new action(cur_status->gamer, {}, new bottom_move());
+        action* bottom_action = new action("bottle_move", cur_status->gamer, {}, new bottom_move());
         cur_status->available_actions.push_back(bottom_action);
     }
+
+    //debug
+    
+
     return;
 }
 
@@ -193,6 +205,17 @@ gamer_status* legend_state::get_cur_status() {
 int legend_state::get_available_state_limit() {
     
     gamer_status* cur_status = this->get_cur_status();
+    
+    /*
+    cout<<"Debug available actions: ";    
+    for (auto iter = cur_status->available_actions.begin();
+         iter != cur_status->available_actions.end();
+         iter++) {
+        auto action = *iter;
+        cout<<action->action_name<<" ";
+    }
+    cout<<endl;
+    */
     return cur_status->available_actions.size();
 }
 
@@ -243,32 +266,41 @@ void legend_state::check_alive() {
 
 legend_state* legend_state::gen_next_state() {
 
-    // TODO
-    this->pprint_state();
-    
-    gamer_status* cur_status = this->get_cur_status();        
-    if (cur_status->gamer->encouraged > 0) {
-        cur_status->gamer->cur_atk = 1.5 * cur_status->gamer->get_base_atk();
-        cur_status->gamer->encouraged -= 1;
-    }
-    cout<<cur_status->name<<"'s turn: "<<endl;
-    int len_of_available_actions = cur_status->available_actions.size();
+    // generate a copy of origin state
+    // then apply random action/skill on the copy state
+    // to get the real next state
+
+    this->check_alive();
+    legend_state* next_state = this->dcopy();
+    gamer_status* next_status = next_state->get_cur_status();        
+    // apply one of available action
+    //gamer_status* cur_status = this->get_cur_status();
+    int len_of_available_actions = next_status->available_actions.size();
     int r = rand() % len_of_available_actions;
-    action* cur_action = cur_status->available_actions[r];
-    cur_action->motion->apply(cur_action->caster, cur_action->target);
-    cout<<cur_status->name<<"使用了 "<<cur_action->motion->name<<" ..."<<endl;
-    cout<<"----------"<<endl;
+    action* cur_action = next_status->available_actions[r];
     
-    this->check_alive();        
-    if (this->is_terminal()) {
-        this->is_over = true;
-        cout<<"游戏结束!!!!"<<endl;
-        return this;
+    cur_action->motion->apply(cur_action->caster, cur_action->target);
+    //cout<<cur_action->action_name<<" "<<next_status->available_actions.size()<<endl;
+    if (next_status->gamer->encouraged > 0) {
+        next_status->gamer->cur_atk = 1.5 * next_status->gamer->get_base_atk();
+        next_status->gamer->encouraged -= 1;
+    }
+    next_state->cur_turn = next_state->get_next_turn();
+    next_state->set_available_actions(next_state->get_cur_status());
+    next_state->used_action_name = cur_action->action_name;
+    
+
+    //cout<<next_status->name<<"'s turn: "<<endl;
+    //cout<<next_status->name<<"使用了 "<<cur_action->motion->name<<" ..."<<endl;
+    //cout<<"----------"<<endl;
+    
+    next_state->check_alive();     
+    //cout<<"------------"<<endl;   
+    if (next_state->is_terminal()) {
+        next_state->is_over = true;        
+        return next_state;
     }
 
-    legend_state* next_state = this->dcopy();        
-    next_state->cur_turn = this->get_next_turn();
-    next_state->set_available_actions(next_state->get_cur_status());
     return next_state;
 
 }
@@ -309,7 +341,7 @@ string legend_state::get_encoding() {
     string estelle_encode = this->get_gamer_encoding(estelle_gamer);
     string joshua_encode = this->get_gamer_encoding(joshua_gamer);
     string leon_encode = this->get_gamer_encoding(leon_gamer);
-    string encode_str = "|E-" + estelle_encode + "|J-" + joshua_encode + "|L-" + leon_encode;
+    string encode_str = this->get_used_action_name() + "|E-" + estelle_encode + "|J-" + joshua_encode + "|L-" + leon_encode;
     return encode_str;
 }
 
@@ -319,7 +351,7 @@ string legend_state::get_encoding() {
 // if player failed but boss 5000 hp left, then reward = - |-5000/1000| = -5
 // reward's range: [-20, 0]
 double legend_state::get_reward() {
-    return - abs(0 - this->leon->gamer->cur_hp);
+    return - abs(0 - this->leon->gamer->cur_hp / 10000.0);
 }
 
 
@@ -351,4 +383,8 @@ void legend_state::pprint_state() {
     cout<<"约修亚- HP:"<<joshua_hp<<" SP: "<<joshua_sp;
     cout<<"剑帝- HP:"<<leon_hp<<endl;
 
+}
+
+string legend_state::get_used_action_name() {
+    return this->used_action_name;
 }

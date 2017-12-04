@@ -12,6 +12,7 @@ public:
     state* game_state;
     int visit_times;
     double q_value;
+    int depth;
 
     legend_mcts();
 

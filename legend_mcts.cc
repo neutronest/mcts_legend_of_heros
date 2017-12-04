@@ -22,6 +22,7 @@ legend_mcts::legend_mcts() {
     this->game_state = nullptr;
     this->visit_times = 0;
     this->q_value = 0.0;
+    this->depth = 1;
 }
 
 bool legend_mcts::is_all_expand() {
@@ -30,8 +31,13 @@ bool legend_mcts::is_all_expand() {
         cout<<"[WARNING... legend_mcts,is_all_expand: game_state is nullptr]"<<endl;
         return false;
     }
-    int avaible_action_num = this->game_state->get_available_state_limit();
-    if (this->children.size() == avaible_action_num) {
+    int available_action_num = this->game_state->get_available_state_limit();
+    cout<<"Test..."<<this->children.size()<<" "<<available_action_num<<endl;
+    cout<<this->game_state->get_encoding()<<endl;
+
+    // test
+
+    if (this->children.size() == available_action_num) {
         return true;
     }
     return false;
@@ -46,12 +52,16 @@ legend_mcts* legend_mcts::expand_node() {
         child_state_encodings.push_back( (*child)->game_state->get_encoding());
     }
 
+    //state* temp_state = this->game_state->dcopy();
     state* new_state = this->game_state->gen_next_state();
     while (std::find(child_state_encodings.begin(), 
                      child_state_encodings.end(),
                      new_state->get_encoding()) != child_state_encodings.end() ) {
         // 
+        //temp_state = this->game_state->dcopy();
         new_state = this->game_state->gen_next_state();
+        //TODO DEBUG
+        //cout<<"Debug: "<<new_state->get_used_action_name()<<endl;
     }
 
     legend_mcts* node = new legend_mcts();
@@ -60,7 +70,11 @@ legend_mcts* legend_mcts::expand_node() {
     node->game_state = new_state;
     node->visit_times = 0;
     node->q_value = 0.0;
+    node->depth = this->depth + 1;
     this->children.push_back(node);
+    cout<<"**(depth:"<<node->depth<<")use action: "<<node->game_state->get_used_action_name()<<endl;
+    cout<<"**expand_node:";
+    node->game_state->pprint();
     return node;
 
 }
@@ -74,7 +88,7 @@ legend_mcts* legend_mcts::get_best_child(int is_exploration) {
     if (is_exploration == 1) {
         c = 1.0 / sqrt(2);
     }
-    
+    //cout<<"len of children: "<<this->children.size()<<endl;
     for (auto iter = this->children.begin(); 
               iter != this->children.end();
               iter++) {
@@ -96,6 +110,10 @@ legend_mcts* legend_mcts::get_best_child(int is_exploration) {
             max_score = ucb_score;
         }   
     }
+    //cout<<"use action: "<<this->game_state->get_action_name()<<endl;
+    cout<<"**(depth:"<<best_node->depth<<")**best_node:";
+    cout<<"**use action: "<<best_node->game_state->get_used_action_name()<<endl;
+    best_node->game_state->pprint();
     return best_node;
 }
 
@@ -117,14 +135,13 @@ legend_mcts* legend_mcts::tree_policy()  {
 
         //cout<<this->game_state->get_encoding()<<endl;
         if (node->is_all_expand()) {
-            cout<<"all expand..."<<endl;
+            //cout<<"all expand..."<<endl;
             // check if boss' turn
             if (this->game_state->is_boss_turn() == true) {
                 // have to random choice child
                 int len_of_children = this->children.size();
                 int r = rand() % len_of_children;
                 node = this->children[r];
-                //game_state* boss_state = this->game_state->gen_next_state();
 
             } else {
                 node = node->get_best_child(1);
@@ -132,7 +149,6 @@ legend_mcts* legend_mcts::tree_policy()  {
             
         } else {
             // expand a new node
-            cout<<"not all expand"<<endl;
             auto new_node = node->expand_node();
             return new_node;
         }

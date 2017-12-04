@@ -21,7 +21,9 @@ public:
     virtual string get_encoding() = 0;
     virtual bool is_terminal() = 0;
     virtual double get_reward() = 0;
+    virtual string get_used_action_name() = 0;
     virtual void pprint() = 0;
     virtual bool is_boss_turn() = 0;
+    virtual state* dcopy() = 0;
 };
 #endif

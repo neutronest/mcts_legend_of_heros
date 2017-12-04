@@ -55,7 +55,7 @@ player::player(double hp, double ep, double sp, double atk) {
     this->cur_atk = this->get_base_atk();
     this->encouraged = 0;
     this->shell = 0;
-    
+    this->is_dead = false;
 }
 
 player* player::dcopy() {
@@ -72,7 +72,8 @@ player* player::dcopy() {
     new_player->cur_atk = this->cur_atk;
     new_player->encouraged = this->encouraged;
     new_player->shell = this->shell;
-    cout<<"player'hp: "<<cur_hp<<endl;
+    new_player->is_dead = this->is_dead;
+    //cout<<"player'hp: "<<cur_hp<<endl;
     return new_player;
 }
     

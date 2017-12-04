@@ -22,10 +22,11 @@ enum class legend_turn {E, J, L};
 // auto ac = new action(leon_gamer, {estelle_gamer, joshua_gamer}, new leon_shadow_atk())
 class action {
 public:
+    string action_name;
     player* caster;
     vector<player*> target;
     skill* motion;
-    action(player* caster_, vector<player*> target_, skill* motion_);
+    action(string action_name_, player* caster_, vector<player*> target_, skill* motion_);
     action* dcopy();
 
 };
@@ -56,21 +57,29 @@ public:
 
 class legend_state: public state  {
 public:
+    // all player status define
     gamer_status* estelle = new gamer_status();
     gamer_status* joshua = new gamer_status();
     gamer_status* leon = new gamer_status();
     legend_turn cur_turn = legend_turn::E; // each game starts with estelle's turn.
+    string used_action_name = "";
     bool is_over = false;
 
     void start();
 
-    void init(player* estelle_gamer, player* joshua_gamer, player* leon_gamer, legend_turn cur_turn);
+    void init(player* estelle_gamer, 
+              player* joshua_gamer, 
+              player* leon_gamer, 
+              legend_turn cur_turn, 
+              bool is_over_);
 
     legend_state* dcopy();
-    
+
     void set_available_actions(gamer_status* cur_status);
 
     gamer_status* get_cur_status();
+
+    int get_state_limit();
 
     int get_available_state_limit();
 
@@ -79,8 +88,6 @@ public:
     legend_state* gen_next_state();
 
     bool simulate_default_policy();
-
-    int get_state_limit();
 
     string get_gamer_encoding(player* gamer);
 
@@ -99,6 +106,8 @@ public:
     void pprint_state();
 
     void print_status();
+
+    string get_used_action_name();
 };
 
 #endif

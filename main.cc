@@ -50,20 +50,23 @@ int main() {
         */
         legend_state* root_state = new legend_state();
         root_state->start();
-        
+
         legend_mcts* root = new legend_mcts();
         root->q_value = 0.0;
         root->visit_times = 0;
         root->game_state = root_state;
         root->children = {};
         int epoches = 100;
-        int computation_budge = 30;
+        int computation_budge = 100;
     
         auto best_node = root;
         for (auto epoch=0; epoch < epoches; epoch++) {
+            cout<<"epoch "<<epoch<<endl;
             
             best_node = best_node->main_search(computation_budge);
-            cout<<"nullptr?"<<endl;
+            cout<<"*** current best step: ";
+            best_node->game_state->pprint();
+            //cout<<"nullptr?"<<endl;
             if (best_node == nullptr) {
                 cout<<"woc.."<<endl;
             }
